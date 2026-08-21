@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>五行 · Estrella de los Cinco Elementos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #0c100f;
+      --ink-soft: #161d1b;
+      --mist: #d4dcd0;
+      --mist-dim: #a8b3a4;
+      --wood: #3a7d5c;
+      --wood-glow: #5cad7a;
+      --fire: #c0392b;
+      --fire-glow: #e85d4c;
+      --earth: #d4a017;
+      --earth-glow: #e8c547;
+      --metal: #e8ece6;
+      --metal-glow: #ffffff;
+      --water: #1a2332;
+      --water-glow: #3d5a80;
+      --water-edge: #6b8cae;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: "Cormorant Garamond", "Noto Serif SC", serif;
+      color: var(--mist);
+      background:
+        radial-gradient(ellipse 90% 70% at 50% 18%, rgba(58, 125, 92, 0.12), transparent 55%),
+        radial-gradient(ellipse 60% 50% at 80% 70%, rgba(192, 57, 43, 0.1), transparent 50%),
+        radial-gradient(ellipse 50% 40% at 15% 80%, rgba(61, 90, 128, 0.18), transparent 45%),
+        radial-gradient(ellipse 100% 80% at 50% 100%, rgba(212, 160, 23, 0.06), transparent 40%),
+        linear-gradient(165deg, #0a0e0d 0%, #121916 40%, #0e1418 100%);
+      overflow-x: hidden;
+    }
+
+    .grain {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      opacity: 0.04;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      z-index: 0;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2.5rem 1.25rem 4rem;
+    }
+
+    /* —— Hero —— */
+    .hero {
+      text-align: center;
+      padding: 1rem 0 0.5rem;
+      animation: rise 1.1s ease-out both;
+    }
+
+    .brand {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(3.5rem, 14vw, 7rem);
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: 0.12em;
+      background: linear-gradient(180deg, #f0f4ec 0%, #a8b5a4 55%, #6d7a6a 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: none;
+      margin-bottom: 0.35rem;
+    }
+
+    .brand-sub {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(0.95rem, 2.5vw, 1.15rem);
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--mist-dim);
+      margin-bottom: 1.25rem;
+    }
+
+    .lede {
+      max-width: 32rem;
+      margin: 0 auto;
+      font-size: clamp(1.15rem, 2.8vw, 1.4rem);
+      font-style: italic;
+      line-height: 1.45;
+      color: var(--mist);
+      opacity: 0.9;
+    }
+
+    /* —— Diagram —— */
+    .diagram-wrap {
+      position: relative;
+      margin: 2.5rem auto 1.5rem;
+      width: min(100%, 560px);
+      aspect-ratio: 1;
+      animation: breathe-in 1.4s 0.2s ease-out both;
+    }
+
+    .diagram-wrap svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      pointer-events: none;
+    }
+
+    .hotspots {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+    }
+
+    .hotspot {
+      position: absolute;
+      width: 18%;
+      height: 18%;
+      border: 0;
+      border-radius: 50%;
+      padding: 0;
+      background: transparent;
+      cursor: pointer;
+      transform: translate(-50%, -50%);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .hotspot:focus-visible {
+      outline: 2px solid rgba(232, 240, 228, 0.7);
+      outline-offset: 3px;
+    }
+
+    /* Positions match SVG nodes in the 500×500 viewBox */
+    .hotspot[data-id="fire"] {
+      left: 50%;
+      top: 15.6%;
+    }
+    .hotspot[data-id="earth"] {
+      left: 82.4%;
+      top: 39.2%;
+    }
+    .hotspot[data-id="metal"] {
+      left: 70%;
+      top: 77.2%;
+    }
+    .hotspot[data-id="water"] {
+      left: 30%;
+      top: 77.2%;
+    }
+    .hotspot[data-id="wood"] {
+      left: 17.6%;
+      top: 39.2%;
+    }
+
+    .cycle-gen {
+      fill: none;
+      stroke: rgba(212, 220, 208, 0.38);
+      stroke-width: 1.75;
+      stroke-dasharray: 5 9;
+      animation: dash-flow 28s linear infinite;
+    }
+
+    .cycle-ctrl {
+      fill: none;
+      stroke: rgba(212, 220, 208, 0.55);
+      stroke-width: 1.4;
+      animation: star-pulse 6s ease-in-out infinite;
+    }
+
+    .node .orb {
+      transition: transform 0.35s ease, filter 0.35s ease;
+      transform-origin: center;
+      transform-box: fill-box;
+    }
+
+    .diagram-wrap:has(.hotspot[data-id="fire"]:hover) .node[data-id="fire"] .orb,
+    .diagram-wrap:has(.hotspot[data-id="fire"]:focus-visible) .node[data-id="fire"] .orb,
+    .node.is-active .orb {
+      transform: scale(1.12);
+      filter: brightness(1.15);
+    }
+
+    .diagram-wrap:has(.hotspot[data-id="earth"]:hover) .node[data-id="earth"] .orb,
+    .diagram-wrap:has(.hotspot[data-id="earth"]:focus-visible) .node[data-id="earth"] .orb {
+      transform: scale(1.12);
+      filter: brightness(1.15);
+    }
+
+    .diagram-wrap:has(.hotspot[data-id="metal"]:hover) .node[data-id="metal"] .orb,
+    .diagram-wrap:has(.hotspot[data-id="metal"]:focus-visible) .node[data-id="metal"] .orb {
+      transform: scale(1.12);
+      filter: brightness(1.15);
+    }
+
+    .diagram-wrap:has(.hotspot[data-id="water"]:hover) .node[data-id="water"] .orb,
+    .diagram-wrap:has(.hotspot[data-id="water"]:focus-visible) .node[data-id="water"] .orb {
+      transform: scale(1.12);
+      filter: brightness(1.15);
+    }
+
+    .diagram-wrap:has(.hotspot[data-id="wood"]:hover) .node[data-id="wood"] .orb,
+    .diagram-wrap:has(.hotspot[data-id="wood"]:focus-visible) .node[data-id="wood"] .orb {
+      transform: scale(1.12);
+      filter: brightness(1.15);
+    }
+
+    .node.is-active .hit-ring,
+    .diagram-wrap:has(.hotspot:hover) .node.is-active .hit-ring {
+      opacity: 1;
+    }
+
+    .diagram-wrap:has(.hotspot[data-id="fire"]:hover) .node[data-id="fire"] .hit-ring,
+    .diagram-wrap:has(.hotspot[data-id="earth"]:hover) .node[data-id="earth"] .hit-ring,
+    .diagram-wrap:has(.hotspot[data-id="metal"]:hover) .node[data-id="metal"] .hit-ring,
+    .diagram-wrap:has(.hotspot[data-id="water"]:hover) .node[data-id="water"] .hit-ring,
+    .diagram-wrap:has(.hotspot[data-id="wood"]:hover) .node[data-id="wood"] .hit-ring {
+      opacity: 0.85;
+    }
+
+    .hit-ring {
+      fill: none;
+      stroke: rgba(232, 240, 228, 0.55);
+      stroke-width: 1.5;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .node-label {
+      font-family: "Noto Serif SC", serif;
+      font-size: 22px;
+      font-weight: 600;
+      text-anchor: middle;
+      dominant-baseline: central;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .node-name {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      text-anchor: middle;
+      fill: #c5cec0;
+      pointer-events: none;
+    }
+
+    .center-seal {
+      font-family: "Noto Serif SC", serif;
+      font-size: 16px;
+      fill: rgba(212, 220, 208, 0.72);
+      text-anchor: middle;
+      dominant-baseline: central;
+      letter-spacing: 0.2em;
+      animation: seal-fade 5s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    /* —— Detail —— */
+    .detail {
+      min-height: 11rem;
+      margin: 0 auto;
+      max-width: 36rem;
+      text-align: center;
+      padding: 1.5rem 0.5rem 0;
+      opacity: 1;
+      transition: opacity 0.35s ease;
+    }
+
+    .detail.is-empty {
+      opacity: 0;
+      min-height: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .detail-char {
+      font-family: "Noto Serif SC", serif;
+      font-size: 3rem;
+      line-height: 1;
+      margin-bottom: 0.25rem;
+      animation: rise 0.45s ease-out both;
+    }
+
+    .detail-title {
+      font-size: 1.65rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+      animation: rise 0.5s 0.05s ease-out both;
+    }
+
+    .detail-pinyin {
+      font-size: 0.95rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--mist-dim);
+      margin-bottom: 1rem;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.65rem 1.5rem;
+      text-align: left;
+      font-size: 1.05rem;
+      line-height: 1.35;
+    }
+
+    @media (max-width: 480px) {
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .detail-grid dt {
+      color: var(--mist-dim);
+      font-size: 0.85rem;
+      letter-spacing: 0.06em;
+    }
+
+    .detail-grid dd {
+      margin-bottom: 0.35rem;
+      color: var(--mist);
+    }
+
+    .hint {
+      text-align: center;
+      font-size: 1.05rem;
+      font-style: italic;
+      color: #b8c2b4;
+      margin-top: 0.5rem;
+      animation: rise 1s 0.6s ease-out both;
+    }
+
+    .hint[hidden] {
+      display: none;
+    }
+
+    /* —— Cycles section —— */
+    .cycles {
+      margin-top: 3.5rem;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(200, 208, 196, 0.12);
+      display: grid;
+      gap: 2rem;
+    }
+
+    @media (min-width: 700px) {
+      .cycles {
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+      }
+    }
+
+    .cycles h2 {
+      font-family: "Noto Serif SC", serif;
+      font-size: 1.35rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.08em;
+    }
+
+    .cycles p {
+      font-size: 1.1rem;
+      line-height: 1.55;
+      color: var(--mist);
+      opacity: 0.88;
+    }
+
+    .cycle-path {
+      margin-top: 0.75rem;
+      font-family: "Noto Serif SC", serif;
+      font-size: 1.05rem;
+      letter-spacing: 0.04em;
+      color: var(--mist-dim);
+    }
+
+    .footer-note {
+      margin-top: 3rem;
+      text-align: center;
+      font-size: 0.95rem;
+      color: var(--mist-dim);
+      line-height: 1.5;
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes breathe-in {
+      from {
+        opacity: 0;
+        transform: scale(0.92);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes dash-flow {
+      to {
+        stroke-dashoffset: -280;
+      }
+    }
+
+    @keyframes star-pulse {
+      0%,
+      100% {
+        opacity: 0.55;
+      }
+      50% {
+        opacity: 1;
+      }
+    }
+
+    @keyframes seal-fade {
+      0%,
+      100% {
+        opacity: 0.35;
+      }
+      50% {
+        opacity: 0.65;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <main class="page">
+    <header class="hero">
+      <h1 class="brand">五行</h1>
+      <p class="brand-sub">Wǔ Xíng · Cinco Elementos</p>
+      <p class="lede">
+        La estrella de la medicina tradicional china: generación y control entre Madera, Fuego, Tierra, Metal y Agua.
+      </p>
+    </header>
+
+    <div class="diagram-wrap" aria-label="Diagrama interactivo de la estrella de los cinco elementos">
+      <div class="hotspots">
+        <button type="button" class="hotspot" data-id="fire" aria-label="Fuego"></button>
+        <button type="button" class="hotspot" data-id="earth" aria-label="Tierra"></button>
+        <button type="button" class="hotspot" data-id="metal" aria-label="Metal"></button>
+        <button type="button" class="hotspot" data-id="water" aria-label="Agua"></button>
+        <button type="button" class="hotspot" data-id="wood" aria-label="Madera"></button>
+      </div>
+      <svg viewBox="0 0 500 500" id="wuxing" aria-hidden="true">
+        <defs>
+          <filter id="soft-glow" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur stdDeviation="4" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          <radialGradient id="g-wood" cx="40%" cy="35%" r="65%">
+            <stop offset="0%" stop-color="#6bbf8a" />
+            <stop offset="55%" stop-color="#3a7d5c" />
+            <stop offset="100%" stop-color="#1e4d36" />
+          </radialGradient>
+          <radialGradient id="g-fire" cx="40%" cy="35%" r="65%">
+            <stop offset="0%" stop-color="#f07167" />
+            <stop offset="50%" stop-color="#c0392b" />
+            <stop offset="100%" stop-color="#7a1c14" />
+          </radialGradient>
+          <radialGradient id="g-earth" cx="40%" cy="35%" r="65%">
+            <stop offset="0%" stop-color="#f0d060" />
+            <stop offset="55%" stop-color="#d4a017" />
+            <stop offset="100%" stop-color="#8a6810" />
+          </radialGradient>
+          <radialGradient id="g-metal" cx="40%" cy="35%" r="65%">
+            <stop offset="0%" stop-color="#ffffff" />
+            <stop offset="45%" stop-color="#e8ece6" />
+            <stop offset="100%" stop-color="#9aa396" />
+          </radialGradient>
+          <radialGradient id="g-water" cx="40%" cy="35%" r="65%">
+            <stop offset="0%" stop-color="#4a6fa5" />
+            <stop offset="50%" stop-color="#1a2332" />
+            <stop offset="100%" stop-color="#05070a" />
+          </radialGradient>
+        </defs>
+
+        <!-- Generating cycle (outer pentagon) -->
+        <polygon
+          class="cycle-gen"
+          points="250,78 412,196 350,386 150,386 88,196"
+        />
+
+        <!-- Controlling cycle (inner star / pentagram) -->
+        <polygon
+          class="cycle-ctrl"
+          points="250,78 350,386 88,196 412,196 150,386"
+        />
+
+        <text class="center-seal" x="250" y="255">相生 · 相克</text>
+
+        <!-- Fire · top -->
+        <g class="node" data-id="fire">
+          <circle class="hit-ring" cx="250" cy="78" r="42" />
+          <circle class="orb" cx="250" cy="78" r="36" fill="url(#g-fire)" filter="url(#soft-glow)" />
+          <text class="node-label" x="250" y="78" fill="#fff8f5">火</text>
+          <text class="node-name" x="250" y="132">Fuego</text>
+        </g>
+
+        <!-- Earth · upper right -->
+        <g class="node" data-id="earth">
+          <circle class="hit-ring" cx="412" cy="196" r="42" />
+          <circle class="orb" cx="412" cy="196" r="36" fill="url(#g-earth)" filter="url(#soft-glow)" />
+          <text class="node-label" x="412" y="196" fill="#2a2208">土</text>
+          <text class="node-name" x="412" y="250">Tierra</text>
+        </g>
+
+        <!-- Metal · lower right -->
+        <g class="node" data-id="metal">
+          <circle class="hit-ring" cx="350" cy="386" r="42" />
+          <circle class="orb" cx="350" cy="386" r="36" fill="url(#g-metal)" filter="url(#soft-glow)" stroke="rgba(255,255,255,0.35)" stroke-width="1" />
+          <text class="node-label" x="350" y="386" fill="#2a3028">金</text>
+          <text class="node-name" x="350" y="440">Metal</text>
+        </g>
+
+        <!-- Water · lower left -->
+        <g class="node" data-id="water">
+          <circle class="hit-ring" cx="150" cy="386" r="42" />
+          <circle class="orb" cx="150" cy="386" r="36" fill="url(#g-water)" filter="url(#soft-glow)" stroke="rgba(107,140,174,0.5)" stroke-width="1" />
+          <text class="node-label" x="150" y="386" fill="#c5d4e8">水</text>
+          <text class="node-name" x="150" y="440">Agua</text>
+        </g>
+
+        <!-- Wood · upper left -->
+        <g class="node" data-id="wood">
+          <circle class="hit-ring" cx="88" cy="196" r="42" />
+          <circle class="orb" cx="88" cy="196" r="36" fill="url(#g-wood)" filter="url(#soft-glow)" />
+          <text class="node-label" x="88" y="196" fill="#e8f5ee">木</text>
+          <text class="node-name" x="88" y="250">Madera</text>
+        </g>
+      </svg>
+    </div>
+
+    <p class="hint" id="hint">Toca un elemento para ver sus fundamentos</p>
+
+    <section class="detail is-empty" id="detail" aria-live="polite"></section>
+
+    <section class="cycles" aria-label="Ciclos de los cinco elementos">
+      <div>
+        <h2>相生 · Ciclo de generación</h2>
+        <p>
+          Cada elemento nutre al siguiente, como una madre a su hijo: la Madera alimenta el Fuego, el Fuego deja Tierra (ceniza), la Tierra contiene Metal, el Metal condensa Agua (rocío), y el Agua nutre la Madera.
+        </p>
+        <p class="cycle-path">木 → 火 → 土 → 金 → 水 → 木</p>
+      </div>
+      <div>
+        <h2>相克 · Ciclo de control</h2>
+        <p>
+          La estrella interior muestra el equilibrio: la Madera sujeta la Tierra (raíces), la Tierra embalsa el Agua, el Agua apaga el Fuego, el Fuego funde el Metal, y el Metal corta la Madera. Sin control, el sistema se desborda.
+        </p>
+        <p class="cycle-path">木 → 土 → 水 → 火 → 金 → 木</p>
+      </div>
+    </section>
+
+    <p class="footer-note">
+      Colores de la MTC: 青 Madera · 赤 Fuego · 黄 Tierra · 白 Metal · 黑 Agua<br />
+      Fundamentos clásicos del sistema 五行 en la medicina tradicional china.
+    </p>
+  </main>
+
+  <script>
+    const ELEMENTS = {
+      wood: {
+        char: "木",
+        name: "Madera",
+        pinyin: "Mù · Qīng",
+        color: "var(--wood-glow)",
+        colorName: "青 · Verde-azulado",
+        season: "Primavera",
+        direction: "Este",
+        organs: "Hígado · Vesícula biliar",
+        emotion: "Ira / frustración",
+        taste: "Ácido",
+        climate: "Viento",
+        generates: "Fuego (火)",
+        controls: "Tierra (土)",
+      },
+      fire: {
+        char: "火",
+        name: "Fuego",
+        pinyin: "Huǒ · Chì",
+        color: "var(--fire-glow)",
+        colorName: "赤 · Bermellón",
+        season: "Verano",
+        direction: "Sur",
+        organs: "Corazón · Intestino delgado",
+        emotion: "Alegría / agitación",
+        taste: "Amargo",
+        climate: "Calor",
+        generates: "Tierra (土)",
+        controls: "Metal (金)",
+      },
+      earth: {
+        char: "土",
+        name: "Tierra",
+        pinyin: "Tǔ · Huáng",
+        color: "var(--earth-glow)",
+        colorName: "黄 · Amarillo",
+        season: "Fin de verano / transición",
+        direction: "Centro",
+        organs: "Bazo · Estómago",
+        emotion: "Preocupación / rumia",
+        taste: "Dulce",
+        climate: "Humedad",
+        generates: "Metal (金)",
+        controls: "Agua (水)",
+      },
+      metal: {
+        char: "金",
+        name: "Metal",
+        pinyin: "Jīn · Bái",
+        color: "var(--metal-glow)",
+        colorName: "白 · Blanco",
+        season: "Otoño",
+        direction: "Oeste",
+        organs: "Pulmón · Intestino grueso",
+        emotion: "Tristeza / duelo",
+        taste: "Picante",
+        climate: "Sequedad",
+        generates: "Agua (水)",
+        controls: "Madera (木)",
+      },
+      water: {
+        char: "水",
+        name: "Agua",
+        pinyin: "Shuǐ · Hēi",
+        color: "var(--water-edge)",
+        colorName: "黑 · Negro / xuan",
+        season: "Invierno",
+        direction: "Norte",
+        organs: "Riñón · Vejiga",
+        emotion: "Miedo",
+        taste: "Salado",
+        climate: "Frío",
+        generates: "Madera (木)",
+        controls: "Fuego (火)",
+      },
+    };
+
+    const detail = document.getElementById("detail");
+    const hint = document.getElementById("hint");
+    const nodes = document.querySelectorAll(".node");
+    const hotspots = document.querySelectorAll(".hotspot");
+
+    function showElement(id) {
+      const el = ELEMENTS[id];
+      if (!el) return;
+
+      nodes.forEach((n) => n.classList.toggle("is-active", n.dataset.id === id));
+      hotspots.forEach((h) => {
+        const active = h.dataset.id === id;
+        h.classList.toggle("is-active", active);
+        h.setAttribute("aria-pressed", active ? "true" : "false");
+      });
+      hint.hidden = true;
+      detail.classList.remove("is-empty");
+      detail.innerHTML = `
+        <div class="detail-char" style="color:${el.color}">${el.char}</div>
+        <h2 class="detail-title">${el.name}</h2>
+        <p class="detail-pinyin">${el.pinyin}</p>
+        <dl class="detail-grid">
+          <div><dt>Color</dt><dd>${el.colorName}</dd></div>
+          <div><dt>Estación</dt><dd>${el.season}</dd></div>
+          <div><dt>Dirección</dt><dd>${el.direction}</dd></div>
+          <div><dt>Órganos</dt><dd>${el.organs}</dd></div>
+          <div><dt>Emoción</dt><dd>${el.emotion}</dd></div>
+          <div><dt>Sabor</dt><dd>${el.taste}</dd></div>
+          <div><dt>Clima</dt><dd>${el.climate}</dd></div>
+          <div><dt>Genera / Controla</dt><dd>${el.generates} · ${el.controls}</dd></div>
+        </dl>
+      `;
+    }
+
+    hotspots.forEach((btn) => {
+      btn.addEventListener("click", () => showElement(btn.dataset.id));
+    });
+
+    // Show Fire by default so the fundamentals are visible immediately
+    showElement("fire");
+  </script>
+</body>
+</html>
