@@ -11,8 +11,8 @@
     :root {
       --ink: #0c100f;
       --ink-soft: #161d1b;
-      --mist: #c8d0c4;
-      --mist-dim: #8a9488;
+      --mist: #d4dcd0;
+      --mist-dim: #a8b3a4;
       --wood: #3a7d5c;
       --wood-glow: #5cad7a;
       --fire: #c0392b;
@@ -123,16 +123,16 @@
 
     .cycle-gen {
       fill: none;
-      stroke: rgba(200, 208, 196, 0.22);
-      stroke-width: 1.5;
-      stroke-dasharray: 6 8;
+      stroke: rgba(212, 220, 208, 0.38);
+      stroke-width: 1.75;
+      stroke-dasharray: 5 9;
       animation: dash-flow 28s linear infinite;
     }
 
     .cycle-ctrl {
       fill: none;
-      stroke: rgba(200, 208, 196, 0.35);
-      stroke-width: 1.25;
+      stroke: rgba(212, 220, 208, 0.55);
+      stroke-width: 1.4;
       animation: star-pulse 6s ease-in-out infinite;
     }
 
@@ -141,10 +141,16 @@
       outline: none;
     }
 
+    .node .hit {
+      fill: transparent;
+      pointer-events: all;
+    }
+
     .node .orb {
       transition: transform 0.35s ease, filter 0.35s ease;
       transform-origin: center;
       transform-box: fill-box;
+      pointer-events: none;
     }
 
     .node:hover .orb,
@@ -152,6 +158,19 @@
     .node.is-active .orb {
       transform: scale(1.12);
       filter: brightness(1.15);
+    }
+
+    .node.is-active .hit-ring {
+      opacity: 1;
+    }
+
+    .hit-ring {
+      fill: none;
+      stroke: rgba(232, 240, 228, 0.55);
+      stroke-width: 1.5;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
     }
 
     .node-label {
@@ -166,21 +185,22 @@
 
     .node-name {
       font-family: "Cormorant Garamond", serif;
-      font-size: 11px;
-      letter-spacing: 0.08em;
+      font-size: 13px;
+      letter-spacing: 0.1em;
       text-anchor: middle;
-      fill: var(--mist-dim);
+      fill: #c5cec0;
       pointer-events: none;
     }
 
     .center-seal {
       font-family: "Noto Serif SC", serif;
-      font-size: 18px;
-      fill: rgba(200, 208, 196, 0.45);
+      font-size: 16px;
+      fill: rgba(212, 220, 208, 0.72);
       text-anchor: middle;
       dominant-baseline: central;
       letter-spacing: 0.2em;
       animation: seal-fade 5s ease-in-out infinite;
+      pointer-events: none;
     }
 
     /* —— Detail —— */
@@ -190,14 +210,12 @@
       max-width: 36rem;
       text-align: center;
       padding: 1.5rem 0.5rem 0;
+      opacity: 1;
       transition: opacity 0.35s ease;
     }
 
-    .detail[hidden] {
-      display: block;
+    .detail.is-empty {
       opacity: 0;
-      pointer-events: none;
-      height: 0;
       min-height: 0;
       padding: 0;
       overflow: hidden;
@@ -235,6 +253,12 @@
       line-height: 1.35;
     }
 
+    @media (max-width: 480px) {
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
     .detail-grid dt {
       color: var(--mist-dim);
       font-size: 0.85rem;
@@ -243,15 +267,20 @@
 
     .detail-grid dd {
       margin-bottom: 0.35rem;
+      color: var(--mist);
     }
 
     .hint {
       text-align: center;
-      font-size: 1rem;
+      font-size: 1.05rem;
       font-style: italic;
-      color: var(--mist-dim);
+      color: #b8c2b4;
       margin-top: 0.5rem;
       animation: rise 1s 0.6s ease-out both;
+    }
+
+    .hint[hidden] {
+      display: none;
     }
 
     /* —— Cycles section —— */
@@ -371,7 +400,7 @@
       </p>
     </header>
 
-    <div class="diagram-wrap" role="img" aria-label="Diagrama de la estrella de los cinco elementos">
+    <div class="diagram-wrap" aria-label="Diagrama interactivo de la estrella de los cinco elementos">
       <svg viewBox="0 0 500 500" id="wuxing">
         <defs>
           <filter id="soft-glow" x="-40%" y="-40%" width="180%" height="180%">
@@ -424,44 +453,54 @@
 
         <!-- Fire · top -->
         <g class="node" data-id="fire" tabindex="0" role="button" aria-label="Fuego">
+          <circle class="hit" cx="250" cy="78" r="48" />
+          <circle class="hit-ring" cx="250" cy="78" r="42" />
           <circle class="orb" cx="250" cy="78" r="36" fill="url(#g-fire)" filter="url(#soft-glow)" />
           <text class="node-label" x="250" y="78" fill="#fff8f5">火</text>
-          <text class="node-name" x="250" y="128">Fuego</text>
+          <text class="node-name" x="250" y="132">Fuego</text>
         </g>
 
         <!-- Earth · upper right -->
         <g class="node" data-id="earth" tabindex="0" role="button" aria-label="Tierra">
+          <circle class="hit" cx="412" cy="196" r="48" />
+          <circle class="hit-ring" cx="412" cy="196" r="42" />
           <circle class="orb" cx="412" cy="196" r="36" fill="url(#g-earth)" filter="url(#soft-glow)" />
           <text class="node-label" x="412" y="196" fill="#2a2208">土</text>
-          <text class="node-name" x="412" y="246">Tierra</text>
+          <text class="node-name" x="412" y="250">Tierra</text>
         </g>
 
         <!-- Metal · lower right -->
         <g class="node" data-id="metal" tabindex="0" role="button" aria-label="Metal">
+          <circle class="hit" cx="350" cy="386" r="48" />
+          <circle class="hit-ring" cx="350" cy="386" r="42" />
           <circle class="orb" cx="350" cy="386" r="36" fill="url(#g-metal)" filter="url(#soft-glow)" stroke="rgba(255,255,255,0.35)" stroke-width="1" />
           <text class="node-label" x="350" y="386" fill="#2a3028">金</text>
-          <text class="node-name" x="350" y="436">Metal</text>
+          <text class="node-name" x="350" y="440">Metal</text>
         </g>
 
         <!-- Water · lower left -->
         <g class="node" data-id="water" tabindex="0" role="button" aria-label="Agua">
+          <circle class="hit" cx="150" cy="386" r="48" />
+          <circle class="hit-ring" cx="150" cy="386" r="42" />
           <circle class="orb" cx="150" cy="386" r="36" fill="url(#g-water)" filter="url(#soft-glow)" stroke="rgba(107,140,174,0.5)" stroke-width="1" />
           <text class="node-label" x="150" y="386" fill="#c5d4e8">水</text>
-          <text class="node-name" x="150" y="436">Agua</text>
+          <text class="node-name" x="150" y="440">Agua</text>
         </g>
 
         <!-- Wood · upper left -->
         <g class="node" data-id="wood" tabindex="0" role="button" aria-label="Madera">
+          <circle class="hit" cx="88" cy="196" r="48" />
+          <circle class="hit-ring" cx="88" cy="196" r="42" />
           <circle class="orb" cx="88" cy="196" r="36" fill="url(#g-wood)" filter="url(#soft-glow)" />
           <text class="node-label" x="88" y="196" fill="#e8f5ee">木</text>
-          <text class="node-name" x="88" y="246">Madera</text>
+          <text class="node-name" x="88" y="250">Madera</text>
         </g>
       </svg>
     </div>
 
     <p class="hint" id="hint">Toca un elemento para ver sus fundamentos</p>
 
-    <section class="detail" id="detail" hidden aria-live="polite"></section>
+    <section class="detail is-empty" id="detail" aria-live="polite"></section>
 
     <section class="cycles" aria-label="Ciclos de los cinco elementos">
       <div>
@@ -573,9 +612,13 @@
       const el = ELEMENTS[id];
       if (!el) return;
 
-      nodes.forEach((n) => n.classList.toggle("is-active", n.dataset.id === id));
+      nodes.forEach((n) => {
+        const active = n.dataset.id === id;
+        n.classList.toggle("is-active", active);
+        n.setAttribute("aria-pressed", active ? "true" : "false");
+      });
       hint.hidden = true;
-      detail.hidden = false;
+      detail.classList.remove("is-empty");
       detail.innerHTML = `
         <div class="detail-char" style="color:${el.color}">${el.char}</div>
         <h2 class="detail-title">${el.name}</h2>
@@ -595,7 +638,10 @@
 
     nodes.forEach((node) => {
       const activate = () => showElement(node.dataset.id);
-      node.addEventListener("click", activate);
+      node.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
+        activate();
+      });
       node.addEventListener("keydown", (e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
@@ -603,6 +649,9 @@
         }
       });
     });
+
+    // Show Fire by default so the fundamentals are visible immediately
+    showElement("fire");
   </script>
 </body>
 </html>
