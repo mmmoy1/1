@@ -119,6 +119,53 @@
       width: 100%;
       height: 100%;
       overflow: visible;
+      pointer-events: none;
+    }
+
+    .hotspots {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+    }
+
+    .hotspot {
+      position: absolute;
+      width: 18%;
+      height: 18%;
+      border: 0;
+      border-radius: 50%;
+      padding: 0;
+      background: transparent;
+      cursor: pointer;
+      transform: translate(-50%, -50%);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .hotspot:focus-visible {
+      outline: 2px solid rgba(232, 240, 228, 0.7);
+      outline-offset: 3px;
+    }
+
+    /* Positions match SVG nodes in the 500×500 viewBox */
+    .hotspot[data-id="fire"] {
+      left: 50%;
+      top: 15.6%;
+    }
+    .hotspot[data-id="earth"] {
+      left: 82.4%;
+      top: 39.2%;
+    }
+    .hotspot[data-id="metal"] {
+      left: 70%;
+      top: 77.2%;
+    }
+    .hotspot[data-id="water"] {
+      left: 30%;
+      top: 77.2%;
+    }
+    .hotspot[data-id="wood"] {
+      left: 17.6%;
+      top: 39.2%;
     }
 
     .cycle-gen {
@@ -136,32 +183,54 @@
       animation: star-pulse 6s ease-in-out infinite;
     }
 
-    .node {
-      cursor: pointer;
-      outline: none;
-    }
-
-    .node .hit {
-      fill: transparent;
-      pointer-events: all;
-    }
-
     .node .orb {
       transition: transform 0.35s ease, filter 0.35s ease;
       transform-origin: center;
       transform-box: fill-box;
-      pointer-events: none;
     }
 
-    .node:hover .orb,
-    .node:focus-visible .orb,
+    .diagram-wrap:has(.hotspot[data-id="fire"]:hover) .node[data-id="fire"] .orb,
+    .diagram-wrap:has(.hotspot[data-id="fire"]:focus-visible) .node[data-id="fire"] .orb,
     .node.is-active .orb {
       transform: scale(1.12);
       filter: brightness(1.15);
     }
 
-    .node.is-active .hit-ring {
+    .diagram-wrap:has(.hotspot[data-id="earth"]:hover) .node[data-id="earth"] .orb,
+    .diagram-wrap:has(.hotspot[data-id="earth"]:focus-visible) .node[data-id="earth"] .orb {
+      transform: scale(1.12);
+      filter: brightness(1.15);
+    }
+
+    .diagram-wrap:has(.hotspot[data-id="metal"]:hover) .node[data-id="metal"] .orb,
+    .diagram-wrap:has(.hotspot[data-id="metal"]:focus-visible) .node[data-id="metal"] .orb {
+      transform: scale(1.12);
+      filter: brightness(1.15);
+    }
+
+    .diagram-wrap:has(.hotspot[data-id="water"]:hover) .node[data-id="water"] .orb,
+    .diagram-wrap:has(.hotspot[data-id="water"]:focus-visible) .node[data-id="water"] .orb {
+      transform: scale(1.12);
+      filter: brightness(1.15);
+    }
+
+    .diagram-wrap:has(.hotspot[data-id="wood"]:hover) .node[data-id="wood"] .orb,
+    .diagram-wrap:has(.hotspot[data-id="wood"]:focus-visible) .node[data-id="wood"] .orb {
+      transform: scale(1.12);
+      filter: brightness(1.15);
+    }
+
+    .node.is-active .hit-ring,
+    .diagram-wrap:has(.hotspot:hover) .node.is-active .hit-ring {
       opacity: 1;
+    }
+
+    .diagram-wrap:has(.hotspot[data-id="fire"]:hover) .node[data-id="fire"] .hit-ring,
+    .diagram-wrap:has(.hotspot[data-id="earth"]:hover) .node[data-id="earth"] .hit-ring,
+    .diagram-wrap:has(.hotspot[data-id="metal"]:hover) .node[data-id="metal"] .hit-ring,
+    .diagram-wrap:has(.hotspot[data-id="water"]:hover) .node[data-id="water"] .hit-ring,
+    .diagram-wrap:has(.hotspot[data-id="wood"]:hover) .node[data-id="wood"] .hit-ring {
+      opacity: 0.85;
     }
 
     .hit-ring {
@@ -169,7 +238,6 @@
       stroke: rgba(232, 240, 228, 0.55);
       stroke-width: 1.5;
       opacity: 0;
-      pointer-events: none;
       transition: opacity 0.3s ease;
     }
 
@@ -401,7 +469,14 @@
     </header>
 
     <div class="diagram-wrap" aria-label="Diagrama interactivo de la estrella de los cinco elementos">
-      <svg viewBox="0 0 500 500" id="wuxing">
+      <div class="hotspots">
+        <button type="button" class="hotspot" data-id="fire" aria-label="Fuego"></button>
+        <button type="button" class="hotspot" data-id="earth" aria-label="Tierra"></button>
+        <button type="button" class="hotspot" data-id="metal" aria-label="Metal"></button>
+        <button type="button" class="hotspot" data-id="water" aria-label="Agua"></button>
+        <button type="button" class="hotspot" data-id="wood" aria-label="Madera"></button>
+      </div>
+      <svg viewBox="0 0 500 500" id="wuxing" aria-hidden="true">
         <defs>
           <filter id="soft-glow" x="-40%" y="-40%" width="180%" height="180%">
             <feGaussianBlur stdDeviation="4" result="blur" />
@@ -452,8 +527,7 @@
         <text class="center-seal" x="250" y="255">相生 · 相克</text>
 
         <!-- Fire · top -->
-        <g class="node" data-id="fire" tabindex="0" role="button" aria-label="Fuego">
-          <circle class="hit" cx="250" cy="78" r="48" />
+        <g class="node" data-id="fire">
           <circle class="hit-ring" cx="250" cy="78" r="42" />
           <circle class="orb" cx="250" cy="78" r="36" fill="url(#g-fire)" filter="url(#soft-glow)" />
           <text class="node-label" x="250" y="78" fill="#fff8f5">火</text>
@@ -461,8 +535,7 @@
         </g>
 
         <!-- Earth · upper right -->
-        <g class="node" data-id="earth" tabindex="0" role="button" aria-label="Tierra">
-          <circle class="hit" cx="412" cy="196" r="48" />
+        <g class="node" data-id="earth">
           <circle class="hit-ring" cx="412" cy="196" r="42" />
           <circle class="orb" cx="412" cy="196" r="36" fill="url(#g-earth)" filter="url(#soft-glow)" />
           <text class="node-label" x="412" y="196" fill="#2a2208">土</text>
@@ -470,8 +543,7 @@
         </g>
 
         <!-- Metal · lower right -->
-        <g class="node" data-id="metal" tabindex="0" role="button" aria-label="Metal">
-          <circle class="hit" cx="350" cy="386" r="48" />
+        <g class="node" data-id="metal">
           <circle class="hit-ring" cx="350" cy="386" r="42" />
           <circle class="orb" cx="350" cy="386" r="36" fill="url(#g-metal)" filter="url(#soft-glow)" stroke="rgba(255,255,255,0.35)" stroke-width="1" />
           <text class="node-label" x="350" y="386" fill="#2a3028">金</text>
@@ -479,8 +551,7 @@
         </g>
 
         <!-- Water · lower left -->
-        <g class="node" data-id="water" tabindex="0" role="button" aria-label="Agua">
-          <circle class="hit" cx="150" cy="386" r="48" />
+        <g class="node" data-id="water">
           <circle class="hit-ring" cx="150" cy="386" r="42" />
           <circle class="orb" cx="150" cy="386" r="36" fill="url(#g-water)" filter="url(#soft-glow)" stroke="rgba(107,140,174,0.5)" stroke-width="1" />
           <text class="node-label" x="150" y="386" fill="#c5d4e8">水</text>
@@ -488,8 +559,7 @@
         </g>
 
         <!-- Wood · upper left -->
-        <g class="node" data-id="wood" tabindex="0" role="button" aria-label="Madera">
-          <circle class="hit" cx="88" cy="196" r="48" />
+        <g class="node" data-id="wood">
           <circle class="hit-ring" cx="88" cy="196" r="42" />
           <circle class="orb" cx="88" cy="196" r="36" fill="url(#g-wood)" filter="url(#soft-glow)" />
           <text class="node-label" x="88" y="196" fill="#e8f5ee">木</text>
@@ -607,15 +677,17 @@
     const detail = document.getElementById("detail");
     const hint = document.getElementById("hint");
     const nodes = document.querySelectorAll(".node");
+    const hotspots = document.querySelectorAll(".hotspot");
 
     function showElement(id) {
       const el = ELEMENTS[id];
       if (!el) return;
 
-      nodes.forEach((n) => {
-        const active = n.dataset.id === id;
-        n.classList.toggle("is-active", active);
-        n.setAttribute("aria-pressed", active ? "true" : "false");
+      nodes.forEach((n) => n.classList.toggle("is-active", n.dataset.id === id));
+      hotspots.forEach((h) => {
+        const active = h.dataset.id === id;
+        h.classList.toggle("is-active", active);
+        h.setAttribute("aria-pressed", active ? "true" : "false");
       });
       hint.hidden = true;
       detail.classList.remove("is-empty");
@@ -636,18 +708,8 @@
       `;
     }
 
-    nodes.forEach((node) => {
-      const activate = () => showElement(node.dataset.id);
-      node.addEventListener("pointerdown", (e) => {
-        e.preventDefault();
-        activate();
-      });
-      node.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          activate();
-        }
-      });
+    hotspots.forEach((btn) => {
+      btn.addEventListener("click", () => showElement(btn.dataset.id));
     });
 
     // Show Fire by default so the fundamentals are visible immediately
